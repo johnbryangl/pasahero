@@ -7,7 +7,7 @@ const QRCode = require('qrcode');
 
 exports.getAll = async (userPayload) => {
   try {
-    const result = await Bookings.findAll();
+    const result = await Bookings.findAll({ include: [Tickets, Users] });
     return result
   } catch (err) {
     console.log(`[Bookings Service]: bookings.service.getAll - ERROR \n ${err.message} \n ${err.stack}`)
