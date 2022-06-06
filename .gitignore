@@ -1,5 +1,6 @@
 .nyc_output
 .scannerwork
+.env
 coverage
 node_modules
 config
