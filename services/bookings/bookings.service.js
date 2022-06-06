@@ -7,7 +7,7 @@ const QRCode = require('qrcode');
 
 exports.getAll = async (userPayload) => {
   try {
-    const result = await Bookings.findAll({ include: [Tickets, Users] });
+    const result = await Bookings.findAll({ include: { all: true, nested: true } });
     return result
   } catch (err) {
     console.log(`[Bookings Service]: bookings.service.getAll - ERROR \n ${err.message} \n ${err.stack}`)
@@ -17,7 +17,7 @@ exports.getAll = async (userPayload) => {
 
 exports.get = async (userPayload, bookingId) => {
   try {
-    const result = await Bookings.findByPk(bookingId);
+    const result = await Bookings.findByPk(bookingId, { include: { all: true, nested: true } });
     if (!result) {
       throw new Errors(HTTP_STATUS.NotFoundError, ERROR_MESSAGE.ERR4001007);
     }
@@ -49,7 +49,7 @@ exports.add = async (userPayload, bookingDetails) => {
 
     bookingDetails.userId = userPayload.id;
 
-    const result = await sequelize.transaction(async (t) => {
+    const bookingResult = await sequelize.transaction(async (t) => {
 
       const updatedFunds = user.funds - bookingDetails.total;
 
@@ -80,8 +80,8 @@ exports.add = async (userPayload, bookingDetails) => {
       return booking;
     });
 
+    const result = await Bookings.findByPk(bookingResult.id, { include: { all: true, nested: true } });
     
-
     return result
   } catch (err) {
     console.log(`[Bookings Service]: bookings.service.add - ERROR \n ${err.message} \n ${err.stack}`);
