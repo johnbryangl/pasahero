@@ -4,6 +4,8 @@ const { HTTP_STATUS } = require('~/utils/constants/http-status-codes');
 const { ERROR_MESSAGE } = require('~/utils/constants/error-messages');
 const { sequelize } = require('~/models');
 const QRCode = require('qrcode');
+const Hashids = require('hashids/cjs');
+const hashids = new Hashids();
 
 exports.getAll = async (userPayload) => {
   try {
@@ -18,6 +20,10 @@ exports.getAll = async (userPayload) => {
 exports.get = async (userPayload, bookingId) => {
   try {
     const result = await Bookings.findByPk(bookingId, { include: { all: true, nested: true } });
+    if (!result.isValid) {
+      result.qr = ''
+    }
+
     if (!result) {
       throw new Errors(HTTP_STATUS.NotFoundError, ERROR_MESSAGE.ERR4001007);
     }
@@ -40,8 +46,13 @@ exports.add = async (userPayload, bookingDetails) => {
     const loopBusFares = await LoopBusFares.findAll({ raw: true });
     // initialize total to 0
     bookingDetails.total = 0;
+    // remove tickets with 0 quantity
+    const filteredTickets = bookingDetails.tickets.filter(ticket => ticket.quantity > 0)
+    bookingDetails.tickets = filteredTickets
     // calculate booking total
     for (let ticket of bookingDetails.tickets) {
+      ticket.loopBusFareId = ticket.id;
+      delete ticket.id
       const loopBusFare = loopBusFares.find(fare => fare.id == ticket.loopBusFareId)
       let partialTotal = Number(ticket.quantity) * loopBusFare.fee
       bookingDetails.total += partialTotal
@@ -49,7 +60,7 @@ exports.add = async (userPayload, bookingDetails) => {
 
     bookingDetails.userId = userPayload.id;
 
-    const bookingResult = await sequelize.transaction(async (t) => {
+    const result = await sequelize.transaction(async (t) => {
 
       const updatedFunds = user.funds - bookingDetails.total;
 
@@ -63,25 +74,21 @@ exports.add = async (userPayload, bookingDetails) => {
       // create ticket booking
       bookingDetails.isPaid = true;
       bookingDetails.isValid = true;
-      
+      console.log(bookingDetails)
 
       const booking = await Bookings.create(bookingDetails, {
         include: [Tickets],
         transaction: t
       });
 
-      const qr = await QRCode.toString(JSON.stringify(
-        { id: booking.id }
-      ), { errorCorrectionLevel: 'H', type: 'svg' });
-      
+      const encryptedId = hashids.encode(booking.id);
+      const qr = await QRCode.toDataURL(encryptedId, { errorCorrectionLevel: 'H', type: 'image/png' });
       // convert to sequelize scope
       await Bookings.update({ qr: qr }, { where: { id: booking.id }, transaction: t });
 
       return booking;
     });
 
-    const result = await Bookings.findByPk(bookingResult.id, { include: { all: true, nested: true } });
-    
     return result
   } catch (err) {
     console.log(`[Bookings Service]: bookings.service.add - ERROR \n ${err.message} \n ${err.stack}`);
