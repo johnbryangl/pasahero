@@ -1,9 +1,9 @@
 const Errors = require('http-errors');
 
-const { LoopBuses } = require('~/models');
+const { LoopBuses, LoopBusLocations } = require('~/models');
 const { HTTP_STATUS } = require('~/utils/constants/http-status-codes');
 const { ERROR_MESSAGE } = require('~/utils/constants/error-messages');
-
+const { Sequelize } = require('sequelize');
 exports.getAll = async (userPayload) => {
   try {
     const result = await LoopBuses.findAll();
@@ -16,7 +16,7 @@ exports.getAll = async (userPayload) => {
 
 exports.get = async (userPayload, loopBusId) => {
   try {
-    const result = await LoopBuses.findByPk(loopBusId);
+    const result = await LoopBuses.findByPk(loopBusId, { include: LoopBusLocations });
     if (!result) {
       throw new Errors(HTTP_STATUS.NotFoundError, ERROR_MESSAGE.ERR4001007);
     }

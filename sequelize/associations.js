@@ -1,18 +1,15 @@
 module.exports = (models) => {
-  // loop-bus-location-transit-duration has reference to loop-bus 
-  models.LoopBuses.hasMany(models.LoopBusLocationTransitDurations, { foreignKey: { allowNull: false } });
-  models.LoopBusLocationTransitDurations.belongsTo(models.LoopBuses, { foreignKey: {  allowNull: false } });
-
-  // loop-bus-location-transit-duration has reference to loop-bus-location
-  models.LoopBusLocations.hasMany(models.LoopBusLocationTransitDurations, { foreignKey: { name: 'fromLoopBusLocationId', allowNull: false } });
-  models.LoopBusLocationTransitDurations.belongsTo(models.LoopBusLocations, { foreignKey: { name: 'fromLoopBusLocationId', allowNull: false } });
-
-  models.LoopBusLocations.hasMany(models.LoopBusLocationTransitDurations, { foreignKey: { name: 'toLoopBusLocationId', allowNull: false } });
-  models.LoopBusLocationTransitDurations.belongsTo(models.LoopBusLocations, { foreignKey: { name: 'toLoopBusLocationId', allowNull: false } });
-
   // loop-bus-fare has reference to loop-bus 
   models.LoopBuses.hasMany(models.LoopBusFares, { foreignKey: { allowNull: false } });
   models.LoopBusFares.belongsTo(models.LoopBuses, { foreignKey: {  allowNull: false } });
+
+  // loop-bus-location has reference to loop-bus 
+  models.LoopBuses.hasMany(models.LoopBusLocations, { foreignKey: { allowNull: false } });
+  models.LoopBusLocations.belongsTo(models.LoopBuses, { foreignKey: {  allowNull: false } });
+
+  // loop-bus has reference to loop-bus-location
+  models.LoopBusLocations.hasMany(models.LoopBuses);
+  models.LoopBuses.belongsTo(models.LoopBusLocations);
 
   // a user can create many bookings
   models.Users.hasMany(models.Bookings, { foreignKey: { allowNull: false } });

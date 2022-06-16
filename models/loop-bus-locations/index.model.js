@@ -12,6 +12,14 @@ module.exports = (sequelize, DataTypes) => {
     stopNumber: {
       type: DataTypes.INTEGER,
       allowNull: false,
+    },
+    coordinates: {
+      type: DataTypes.JSON,
+      allowNull: false,
+    },
+    durationInto: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     }
   }, { timestamps: false });
 };
