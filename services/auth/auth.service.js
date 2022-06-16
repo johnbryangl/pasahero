@@ -1,3 +1,4 @@
+const Errors = require('http-errors');
 const bcrypt = require('bcrypt');
 const { Users } = require('~/models');
 const { signToken } = require('~/utils/helpers/jwt-functions');
