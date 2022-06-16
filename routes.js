@@ -7,12 +7,13 @@ const bookingsRoutes = require('~/routes/bookings/index.route');
 
 const loopBusesRoutes = require('~/routes/loop-buses/index.route');
 const loopBusFaresRoutes = require('~/routes/loop-bus-fares/index.route');
-
+const loopBusLocationsRoutes = require('~/routes/loop-bus-locations/index.route');
 module.exports = (app) => {
   authRoutes(router);
   usersRoutes(router);
   bookingsRoutes(router);
   loopBusesRoutes(router);
   loopBusFaresRoutes(router);
+  loopBusLocationsRoutes(router);
   app.use('/api', router);
 };
