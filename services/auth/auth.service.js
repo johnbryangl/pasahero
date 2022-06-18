@@ -25,7 +25,3 @@ exports.logIn = async (userId, password) => {
     throw err;
   }
 };
-
-exports.logOut = async (id) => {
-
-};

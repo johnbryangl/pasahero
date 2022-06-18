@@ -32,3 +32,12 @@ exports.add = async (req, res) => {
   }
 };
 
+exports.update = async (req, res) => {
+  try {
+    const { user: userPayload, params: { id: bookingId }, body: bookingPayload } = req;
+    const result = await service.update(userPayload, bookingId, bookingPayload);
+    handleSuccessResponse(res, SUCCESS_MESSAGE.BOOK2002004, result);
+  } catch (err) {
+    handleErrorResponse(res, err);
+  }
+}

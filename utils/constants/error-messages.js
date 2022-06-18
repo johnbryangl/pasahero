@@ -12,6 +12,8 @@ const ERROR_MESSAGE = {
 
   ERR4001008: { message: { title: 'No Tickets', description: 'This booking has no tickets, kindly add a ticket.' } },
   ERR4001009: { message: { title: 'Insufficient Funds', description: 'Kindly load your PayPal wallet to proceed with the transaction.' } },
+  ERR4001010: { message: { title: 'Invalid Booking Tickets - Expired', description: 'This ticket booking has expired.' } },
+  ERR4001011: { message: { title: 'Invalid Booking Tickets - Wrong Bus', description: 'This ticket booking does not belong to this bus.' } },
 };
 
 module.exports = { ERROR_MESSAGE };

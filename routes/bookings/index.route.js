@@ -7,4 +7,5 @@ module.exports = (router) => {
   router.get(`${prefix}`, auth, asyncHandler(controller.getAll));
   router.get(`${prefix}/:id`, auth, asyncHandler(controller.get));
   router.post(`${prefix}`, auth, asyncHandler(controller.add));
+  router.patch(`${prefix}/:id`, auth, asyncHandler(controller.update));
 }

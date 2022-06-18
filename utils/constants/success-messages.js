@@ -10,7 +10,7 @@ const SUCCESS_MESSAGE = {
   BOOK2002001: { title: 'Ticket Booking', description: 'Ticket bookings have been successfully retrieved.' },
   BOOK2002002: { title: 'Ticket Booking', description: 'Ticket booking has been successfully retrieved.' },
   BOOK2002003: { title: 'Ticket Booking', description: 'Ticket booking has been successfully created.' },
-
+  BOOK2002004: { title: 'Ticket Booking', description: 'Ticket booking has been successfully validated.' },
   // loop-bus
   BUS2003001: { title: 'Loop Bus', description: 'Loop buses have been successfully retrieved.' },
   BUS2003002: { title: 'Loop Bus', description: 'Loop bus has been successfully retrieved.' },

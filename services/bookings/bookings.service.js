@@ -1,5 +1,5 @@
 const Errors = require('http-errors');
-const { Users, Bookings, Tickets, LoopBusFares } = require('~/models');
+const { Users, Bookings, Tickets, LoopBusFares, LoopBuses } = require('~/models');
 const { HTTP_STATUS } = require('~/utils/constants/http-status-codes');
 const { ERROR_MESSAGE } = require('~/utils/constants/error-messages');
 const { sequelize } = require('~/models');
@@ -64,6 +64,14 @@ exports.add = async (userPayload, bookingDetails) => {
       bookingDetails.total += partialTotal
     }
 
+    
+    
+    const findLoopBusId = await LoopBusFares.findByPk(bookingDetails.tickets[0].loopBusFareId, {include: LoopBuses})
+    const loopBusId = findLoopBusId.loop_bus.id
+    
+    bookingDetails.loopBusId = loopBusId
+    bookingDetails.loopBusLocationIdDropoff = null
+    
     bookingDetails.userId = userPayload.id;
 
     const result = await sequelize.transaction(async (t) => {
@@ -101,3 +109,42 @@ exports.add = async (userPayload, bookingDetails) => {
     throw err;
   }
 };
+
+exports.update = async (userPayload, bookingId, bookingPayload) => {
+  try {
+
+    if (userPayload.role != 'driver') {
+      throw new Errors(HTTP_STATUS.ForbiddenError, ERROR_MESSAGE.ERR4001003);
+    }
+
+    // expected bookingPayload structure
+    // {
+    //   driverCurrentLoopBusId : 1,
+    // }
+
+    const bookingToScan = await Bookings.findByPk(bookingId)
+    
+    // check if ticket is paid and is valid
+    if (!bookingToScan.isValid) {
+      throw new Errors(HTTP_STATUS.BadRequestError, ERROR_MESSAGE.ERR4001010);
+    }
+
+    // check if ticket is being scanned with the right loop bus
+    if (Number(bookingToScan.loopBusId) != Number(bookingPayload.driverCurrentLoopBusId)) {
+      throw new Errors(HTTP_STATUS.BadRequestError, ERROR_MESSAGE.ERR4001011);
+    }
+   
+    // mark ticket as invalid and update its location drop off
+    const result = await Bookings.update({ isValid: false }, {
+      where: {
+        id: bookingId
+      }
+    });
+
+    return result
+
+  } catch (err) {
+    console.log(`[Bookings Service]: bookings.service.update - ERROR \n ${err.message} \n ${err.stack}`);
+    throw err;
+  }
+}
