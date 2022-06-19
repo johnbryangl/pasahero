@@ -19,7 +19,7 @@
     app.use(cors());
 
     // condition here
-    if (true) {
+    if (false) {
       await sequelize.sync()
       console.log('Database sync complete.')
     }

@@ -4,8 +4,8 @@ const { handleSuccessResponse, handleErrorResponse } = require('~/utils/helpers/
 const get = async (req, res) => {
   try {
     
-    const { user: userPayload, query: { reportType } } = req;
-    const result = await service.get(userPayload, reportType);
+    const { user: userPayload, query: { reportType, queryDetails } } = req;
+    const result = await service.get(userPayload, reportType, queryDetails);
     handleSuccessResponse(res, '', result);
   } catch (err) {
     handleErrorResponse(res, err);
