@@ -9,10 +9,18 @@ const hashids = new Hashids();
 
 exports.getAll = async (userPayload) => {
   try {
-    const result = await Bookings.findAll({ 
-      where: { userId: userPayload.id },
-      include: { all: true, nested: true } 
-    });
+    let result;
+    if (userPayload.role == 'commuter') {
+      
+      result = await Bookings.findAll({ 
+        where: { userId: userPayload.id },
+        include: { all: true, nested: true } 
+      });
+    } else {
+      result = await Bookings.findAll({ 
+        include: { all: true, nested: true } 
+      });
+    }
     return result
   } catch (err) {
     console.log(`[Bookings Service]: bookings.service.getAll - ERROR \n ${err.message} \n ${err.stack}`)

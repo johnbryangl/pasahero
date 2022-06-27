@@ -1,4 +1,4 @@
-const { Bookings, LoopBusLocations, LoopBuses } = require('~/models');
+const { Bookings, LoopBusLocations, LoopBuses, Tickets } = require('~/models');
 
 const { Op, Sequelize } = require("sequelize");
 
@@ -89,19 +89,24 @@ module.exports = async () => {
     for (let time of Object.keys(loopBus1Hours)) {
       let bookingsLoopBus1 = await Bookings.findAll(
         {
+          include: Tickets,
           where: {
             where: Sequelize.where(Sequelize.fn('hour', Sequelize.col('createdAt')), '=', time),
             loopBusId: 1
           }
         }
       )
+
+      bookingsLoopBus1.forEach(booking => {
+        loopBus1Hours[time] += booking.tickets.length
+      })
   
-      loopBus1Hours[time] = bookingsLoopBus1.length
     }
 
     for (let time of Object.keys(loopBus2Hours)) {
       let bookingsLoopBus2 = await Bookings.findAll(
         {
+          include: Tickets,
           where: {
             where: Sequelize.where(Sequelize.fn('hour', Sequelize.col('createdAt')), '=', time),
             loopBusId: 2
@@ -109,7 +114,9 @@ module.exports = async () => {
         }
       )
   
-      loopBus2Hours[time] = bookingsLoopBus2.length
+      bookingsLoopBus2.forEach(booking => {
+        loopBus2Hours[time] += booking.tickets.length
+      })
     }
   
     let newLoopBus1Hours = {};

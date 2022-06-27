@@ -9,9 +9,8 @@ exports.logIn = async (userId, password) => {
   try {
     const user = await Users.findByPk(userId);
     const hasCorrectCredentials = user ? await bcrypt.compare(password, user.password) : false;
-
     if (hasCorrectCredentials) {
-      const userDetails = { id: user.id, role: user.role };
+      const userDetails = { id: user.id, role: user.role, loopBusId: user.loopBusId };
       const accessToken = await signToken(userDetails)
       
       userDetails.fullName = user.fullName
